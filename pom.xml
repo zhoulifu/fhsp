@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>netty-codec-socks</artifactId>
             <version>4.1.9.Final</version>
         </dependency>
     </dependencies>
