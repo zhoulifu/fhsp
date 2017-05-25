@@ -21,7 +21,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -31,14 +30,12 @@ import io.netty.handler.codec.socks.SocksCmdStatus;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
-import pers.zlf.fhsp.ByteBufSplitter;
 
 @ChannelHandler.Sharable
 public final class SocksServerConnectHandler extends
         SimpleChannelInboundHandler<SocksCmdRequest> {
 
     private final Bootstrap b = new Bootstrap();
-    private final ChannelInboundHandler splitter = new ByteBufSplitter();
 
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, final SocksCmdRequest request) throws Exception {
@@ -55,7 +52,7 @@ public final class SocksServerConnectHandler extends
                                 public void operationComplete(ChannelFuture channelFuture) {
                                     ctx.pipeline().remove(SocksServerConnectHandler.this);
                                     outboundChannel.pipeline().addLast(new RelayHandler(ctx.channel()));
-                                    ctx.pipeline().addLast(splitter, new RelayHandler(outboundChannel));
+                                    ctx.pipeline().addLast(new RelayHandler(outboundChannel));
                                 }
                             });
                 } else {
