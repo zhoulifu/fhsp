@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import pers.zlf.fhsp.config.Configuration;
 import pers.zlf.fhsp.splitter.ChunkSizeEmitter;
 
 @ChannelHandler.Sharable
@@ -16,8 +17,7 @@ public class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
     private ChunkSizeEmitter splitter;
 
     public ByteBufSplitter() {
-        String clazz = System.getProperty("splitter",
-                                          "pers.zlf.fhsp.splitter.DoubleChunkSizeEmitter");
+        String clazz = Configuration.splitter();
         try {
             Constructor<?> constructor = Class.forName(clazz).getConstructor();
             this.splitter = (ChunkSizeEmitter) constructor.newInstance();

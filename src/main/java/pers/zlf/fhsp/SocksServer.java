@@ -19,12 +19,10 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import pers.zlf.fhsp.config.Configuration;
 import pers.zlf.fhsp.socks.SocksServerInitializer;
 
 public final class SocksServer {
-
-    static final int PORT = Integer.parseInt(System.getProperty("port", "1080"));
-
     public static void main(String[] args) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -33,7 +31,7 @@ public final class SocksServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .childHandler(new SocksServerInitializer());
-            b.bind(PORT).sync().channel().closeFuture().sync();
+            b.bind(Configuration.port()).sync().channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
