@@ -15,6 +15,9 @@
  */
 package pers.zlf.fhsp.socks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -34,6 +37,8 @@ import io.netty.util.concurrent.Promise;
 @ChannelHandler.Sharable
 public final class SocksServerConnectHandler extends
         SimpleChannelInboundHandler<SocksCmdRequest> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            SocksServerConnectHandler.class);
 
     private final Bootstrap b = new Bootstrap();
 
@@ -86,6 +91,9 @@ public final class SocksServerConnectHandler extends
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Exception caught", cause);
+        }
         SocksServerUtils.closeOnFlush(ctx.channel());
     }
 }

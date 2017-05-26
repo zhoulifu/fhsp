@@ -15,7 +15,12 @@
  */
 package pers.zlf.fhsp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -23,6 +28,8 @@ import pers.zlf.fhsp.config.Configuration;
 import pers.zlf.fhsp.socks.SocksServerInitializer;
 
 public final class SocksServer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocksServer.class);
+
     public static void main(String[] args) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -31,7 +38,22 @@ public final class SocksServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .childHandler(new SocksServerInitializer());
-            b.bind(Configuration.port()).sync().channel().closeFuture().sync();
+
+            ChannelFuture future = b.bind(Configuration.port()).addListener(
+                    new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws
+                                Exception {
+                            if (future.isSuccess()) {
+                                if (LOGGER.isInfoEnabled()) {
+                                    LOGGER.info("Server started, listening on port {}",
+                                                Configuration.port());
+                                }
+                            }
+                        }
+                    });
+
+            future.sync().channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();

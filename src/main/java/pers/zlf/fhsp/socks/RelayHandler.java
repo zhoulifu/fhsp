@@ -17,6 +17,9 @@ package pers.zlf.fhsp.socks;
 
 import java.net.InetSocketAddress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,6 +28,7 @@ import io.netty.util.ReferenceCountUtil;
 import pers.zlf.fhsp.ByteBufSplitter;
 
 public final class RelayHandler extends ChannelInboundHandlerAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RelayHandler.class);
 
     private final Channel relayChannel;
 
@@ -64,7 +68,9 @@ public final class RelayHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Exception caught", cause);
+        }
         ctx.close();
     }
 }

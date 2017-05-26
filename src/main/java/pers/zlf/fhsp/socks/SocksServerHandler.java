@@ -15,6 +15,9 @@
  */
 package pers.zlf.fhsp.socks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -29,6 +32,8 @@ import io.netty.handler.codec.socks.SocksRequest;
 
 @ChannelHandler.Sharable
 public final class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            SocksServerHandler.class);
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, SocksRequest socksRequest) throws Exception {
@@ -68,7 +73,9 @@ public final class SocksServerHandler extends SimpleChannelInboundHandler<SocksR
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable throwable) {
-        throwable.printStackTrace();
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Exception caught", throwable);
+        }
         SocksServerUtils.closeOnFlush(ctx.channel());
     }
 }
