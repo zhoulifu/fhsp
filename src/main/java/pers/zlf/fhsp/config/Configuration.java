@@ -112,10 +112,11 @@ public final class Configuration {
     }
 
     public static int port() {
-        return Integer.parseInt(getInstance().prop.getProperty("port"));
+        return Integer.parseInt(getInstance().prop.getProperty("port", "1080"));
     }
 
     public static String splitter() {
-        return getInstance().prop.getProperty("splitter");
+        return getInstance().prop.getProperty("splitter",
+                                              "pers.zlf.fhsp.splitter.DoubleChunkSizeEmitter");
     }
 }
