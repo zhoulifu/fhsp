@@ -15,11 +15,14 @@
  */
 package pers.zlf.fhsp.socks;
 
+import java.net.InetSocketAddress;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import pers.zlf.fhsp.ByteBufSplitter;
 
 public final class RelayHandler extends ChannelInboundHandlerAdapter {
 
@@ -27,6 +30,15 @@ public final class RelayHandler extends ChannelInboundHandlerAdapter {
 
     public RelayHandler(Channel relayChannel) {
         this.relayChannel = relayChannel;
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        // Split plaintext transferred within HTTP only
+        if (((InetSocketAddress) relayChannel.remoteAddress()).getPort() == 80) {
+            ctx.pipeline().addBefore(ctx.name(), ByteBufSplitter.class.getName(),
+                                     ByteBufSplitter.getInstance());
+        }
     }
 
     @Override

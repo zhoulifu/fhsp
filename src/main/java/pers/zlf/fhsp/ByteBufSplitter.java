@@ -1,6 +1,5 @@
 package pers.zlf.fhsp;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
@@ -13,17 +12,21 @@ import pers.zlf.fhsp.splitter.ChunkSizeEmitter;
 
 @ChannelHandler.Sharable
 public class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
+    private static final ByteBufSplitter INSTANCE = new ByteBufSplitter();
 
     private ChunkSizeEmitter splitter;
 
-    public ByteBufSplitter() {
-        String clazz = Configuration.splitter();
+    private ByteBufSplitter() {
         try {
-            Constructor<?> constructor = Class.forName(clazz).getConstructor();
-            this.splitter = (ChunkSizeEmitter) constructor.newInstance();
+            this.splitter = (ChunkSizeEmitter) Class.forName(Configuration.splitter())
+                                                    .newInstance();
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    public static ByteBufSplitter getInstance() {
+        return INSTANCE;
     }
 
     @Override

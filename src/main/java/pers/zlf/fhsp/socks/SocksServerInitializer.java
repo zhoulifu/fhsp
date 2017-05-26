@@ -15,19 +15,16 @@
  */
 package pers.zlf.fhsp.socks;
 
-import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.socks.SocksInitRequestDecoder;
 import io.netty.handler.codec.socks.SocksMessageEncoder;
-import pers.zlf.fhsp.ByteBufSplitter;
 
 public final class SocksServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SocksMessageEncoder socksMessageEncoder = new SocksMessageEncoder();
     private final SocksServerHandler socksServerHandler = new SocksServerHandler();
-    private final ChannelInboundHandler splitter = new ByteBufSplitter();
 
     @Override
     public void initChannel(SocketChannel socketChannel) throws Exception {
@@ -35,6 +32,5 @@ public final class SocksServerInitializer extends ChannelInitializer<SocketChann
         p.addLast(new SocksInitRequestDecoder());
         p.addLast(socksMessageEncoder);
         p.addLast(socksServerHandler);
-        p.addLast(splitter);
     }
 }
