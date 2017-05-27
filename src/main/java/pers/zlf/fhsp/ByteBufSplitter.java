@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -42,18 +41,21 @@ public class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(
             ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        int size = 1;
-        ByteBufAllocator allocator = ctx.alloc();
+        int chunkSize = 2;
+        int written = 0;
+        ByteBuf chunk;
 
         for (;;) {
-            if (size >= msg.readableBytes()) {
+            if (chunkSize >= msg.readableBytes()) {
                 out.add(msg.retain());
                 break;
             } else {
-                ByteBuf buf = allocator.buffer(size);
-                buf.writeBytes(msg, size);
-                out.add(buf);
-                size = splitter.nextChunkSize(size, msg.readableBytes());
+                written += chunkSize;
+                chunk = msg.retainedDuplicate();
+                msg.readerIndex(written);
+                chunk.writerIndex(written);
+                out.add(chunk);
+                chunkSize = splitter.nextChunkSize(chunkSize, msg.readableBytes());
             }
         }
     }
