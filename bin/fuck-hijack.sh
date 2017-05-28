@@ -25,9 +25,10 @@ done
 FHSP_HOME=`cd $(dirname "$FILE_PATH")/.. > /dev/null; pwd`
 LOG_DIR=${FHSP_HOME}/logs
 PID_FILE=${FHSP_HOME}/fhsp.pid
-JAR_FILE=fhsp.jar
+JAR_FILE=`find ${FHSP_HOME} -name 'fhsp*.jar' | sed -n '1p'`
 
 [[ -d "$LOG_DIR" ]] || mkdir ${LOG_DIR} || exit $?
+[[ -n "$JAR_FILE" ]] || { echo "Unable to access jarfile."; exit 1; }
 
 isRunning() {
   ps -p "$1" &> /dev/null
@@ -35,8 +36,9 @@ isRunning() {
 
 start() {
   [[ -f ${PID_FILE} ]] && PID=`cat ${PID_FILE}` && isRunning ${PID} && { echo "Already started."; return 0; }
-  ${JAVA_CMD} -jar ${FHSP_HOME}/${JAR_FILE} >> ${LOG_DIR}/$(date '+%Y-%m-%d').log 2>&1 &
+  ${JAVA_CMD} -jar ${JAR_FILE} >> ${LOG_DIR}/$(date '+%Y-%m-%d').log 2>&1 &
   PID=$!
+  echo "Started [$PID]"
   echo ${PID} > ${PID_FILE}
 }
 
