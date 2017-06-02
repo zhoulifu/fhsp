@@ -31,7 +31,8 @@ JAR_FILE=`find ${FHSP_HOME} -name 'fhsp*.jar' | sed -n '1p'`
 [[ -n "$JAR_FILE" ]] || { echo "Unable to access jarfile."; exit 1; }
 
 isRunning() {
-  ps -p "$1" &> /dev/null
+  RUN_INFO=`ps -fp "$1" | sed -n '2p'`
+  expr "$RUN_INFO" : ".*$JAR_FILE" > /dev/null
 }
 
 start() {
