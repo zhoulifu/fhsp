@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import pers.zlf.fhsp.config.Configuration;
 import pers.zlf.fhsp.splitter.ChunkSizeEmitter;
 import pers.zlf.fhsp.splitter.DoubleChunkSizeEmitter;
 
 @ChannelHandler.Sharable
-public class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
+public class ByteBufSplitter extends ByteToMessageDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ByteBufSplitter.class);
     private static final ByteBufSplitter INSTANCE = new ByteBufSplitter();
 
@@ -42,21 +42,17 @@ public class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
     protected void decode(
             ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         int chunkSize = 2;
-        int written = 0;
         ByteBuf chunk;
 
         for (;;) {
             if (chunkSize >= msg.readableBytes()) {
                 out.add(msg.retain());
                 break;
-            } else {
-                written += chunkSize;
-                chunk = msg.retainedDuplicate();
-                msg.readerIndex(written);
-                chunk.writerIndex(written);
-                out.add(chunk);
-                chunkSize = splitter.nextChunkSize(chunkSize, msg.readableBytes());
             }
+
+            chunk = msg.readRetainedSlice(chunkSize);
+            out.add(chunk);
+            chunkSize = splitter.nextChunkSize(chunkSize, msg.readableBytes());
         }
     }
 }
