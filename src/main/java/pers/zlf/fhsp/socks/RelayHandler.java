@@ -25,10 +25,12 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
-import pers.zlf.fhsp.ByteBufSplitter;
+import pers.zlf.fhsp.config.Configuration;
+import pers.zlf.fhsp.splitter.ByteBufSplitter;
 
 public final class RelayHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(RelayHandler.class);
+    private static final ByteBufSplitter SPLITTER = Configuration.splitter();
 
     private final Channel relayChannel;
 
@@ -41,7 +43,7 @@ public final class RelayHandler extends ChannelInboundHandlerAdapter {
         // Split plaintext transferred within HTTP only
         if (((InetSocketAddress) relayChannel.remoteAddress()).getPort() == 80) {
             ctx.pipeline().addBefore(ctx.name(), ByteBufSplitter.class.getName(),
-                                     ByteBufSplitter.getInstance());
+                                     SPLITTER);
         }
     }
 
