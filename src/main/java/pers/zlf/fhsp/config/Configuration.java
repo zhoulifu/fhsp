@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import pers.zlf.fhsp.splitter.ByteBufSplitter;
+import pers.zlf.fhsp.splitter.DoubleSizeSplitter;
 import pers.zlf.fhsp.utils.StreamUtils;
 
 public final class Configuration {
@@ -115,8 +117,13 @@ public final class Configuration {
         return Integer.parseInt(getInstance().prop.getProperty("port", "1080"));
     }
 
-    public static String splitter() {
-        return getInstance().prop.getProperty("splitter",
-                                              "pers.zlf.fhsp.splitter.DoubleChunkSizeEmitter");
+    public static ByteBufSplitter splitter() {
+        try {
+            Class clazz = Class.forName(getInstance().prop.getProperty("splitter",
+                                                                       "pers.zlf.fhsp.splitter.DoubleSizeSplitter"));
+            return (ByteBufSplitter) clazz.newInstance();
+        } catch (Throwable throwable) {
+            return new DoubleSizeSplitter();
+        }
     }
 }
