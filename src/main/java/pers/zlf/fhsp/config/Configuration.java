@@ -18,11 +18,11 @@ import pers.zlf.fhsp.utils.StreamUtils;
 public final class Configuration {
     private static final String CONFIG_FILE_NAME = "fhsp.properties";
 
-    private static Path CONFIG_EXTRACT_PATH;
+    private static final Path CONFIG_EXTRACT_PATH;
 
-    private static boolean EXTRACT;
+    private static final boolean EXTRACT;
 
-    private static Configuration INSTANCE;
+    private static final Configuration INSTANCE;
 
     private Properties prop;
 
@@ -31,6 +31,8 @@ public final class Configuration {
                 System.getProperty("user.home"), ".fhsp", CONFIG_FILE_NAME);
         EXTRACT = "true".equalsIgnoreCase(
                 System.getProperty("extract", "false"));
+
+        INSTANCE = new Configuration();
     }
 
     private Configuration() {
@@ -67,14 +69,10 @@ public final class Configuration {
         return getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_NAME);
     }
 
-    private Properties loadProperties(InputStream in) {
-        try {
-            Properties properties = new Properties();
-            properties.load(in);
-            return properties;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load properties", e);
-        }
+    private Properties loadProperties(InputStream in) throws IOException {
+        Properties properties = new Properties();
+        properties.load(in);
+        return properties;
     }
 
     private void extractIfNeeded(InputStream in) throws IOException {
@@ -102,14 +100,6 @@ public final class Configuration {
     }
 
     public static Configuration getInstance() {
-        if (INSTANCE == null) {
-            synchronized (Configuration.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new Configuration();
-                }
-            }
-        }
-
         return INSTANCE;
     }
 

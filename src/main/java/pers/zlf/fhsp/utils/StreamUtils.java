@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 public class StreamUtils {
-    public static final int BUFFER_SIZE = 4096;
+    public static final int BUFFER_SIZE = 256;
 
     private StreamUtils() {
     }
