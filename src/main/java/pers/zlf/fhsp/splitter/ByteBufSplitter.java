@@ -3,11 +3,9 @@ package pers.zlf.fhsp.splitter;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
-@ChannelHandler.Sharable
 public abstract class ByteBufSplitter extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
